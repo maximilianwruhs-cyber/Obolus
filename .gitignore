@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Runtime data (re-generated)
+data/benchmark_results.json
+data/evolution_curve.json
+data/evolution_history.json
+data/mutation_leaderboard.json
+data/hardware_state.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.gemini/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
