@@ -261,7 +261,7 @@ def print_recommendation(rec: dict = None):
     organ_hints = rec.get("organ_hints")
     if organ_hints:
         print(f"  ╠{'═'*62}╣")
-        print(f"  ║  🧬 Arena organ hints (optional; experimental){' '*16}║")
+        print(f"  ║  🧬 Arena organ hints (display-only; not best_overall){' '*5}║")
         print(f"  ║{' '*62}║")
         for hint in organ_hints[:8]:
             tag = str(hint.get("ollama_tag", "?"))[:22]

@@ -62,14 +62,15 @@ Same ladder on `Qwen/Qwen2.5-Coder-1.5B-Instruct` / `qwen2.5-coder:1.5b` (see Ar
 
 ## Future (10× direction — not a ship claim)
 
-Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–25 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1→v0.2, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate, product fold v0.2 (`organs fold`), operator overnight hold (`hold --hours 8`), hold report digest (`hold --report`), lab smoke (`cargo run -- smoke` / `make lab-smoke`). Public stranger path stays `make demo`. Still **not production-ready**.
+Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–26 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1→v0.2, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate, product fold v0.2 (`organs fold`), operator overnight hold (`hold --hours 8`), hold report digest (`hold --report`), lab smoke (`cargo run -- smoke` / `make lab-smoke`), **ship bar** (`docs/SHIP_BAR.md` — `production_ready` only with `--authorize-production` after ship checks). Public stranger path stays `make demo`. Lab healthy ≠ production-ready until the ship bar clears.
 
-### Product fold v0.2 (optional)
+### Product fold v0.2 (optional, display-only)
 
 ```bash
 # In obolus-arena (after readiness / organ scores):
 cargo run -- organs fold --obolus-root ../Obolus --require-readiness
-# In Obolus — recommend shows role/metric hints; make demo still works without the file
+# In Obolus — recommend shows role/metric hints; does NOT change best_overall
+# make demo still works without the file
 obulus.py recommend
 ```
 
@@ -78,6 +79,7 @@ obulus.py recommend
 - Arena policy: `obolus-arena/program.md`
 - Arena phase map: `obolus-arena/docs/PLAN.md`
 - Arena north star: `obolus-arena/docs/NORTH_STAR.md`
+- Ship bar / repro: `obolus-arena/docs/SHIP_BAR.md`, `obolus-arena/docs/REPRO.md`
 - Broader SLM research: [SLM_TRAINING.md](./SLM_TRAINING.md)
 
 ## Example ladder ranking (single seed; estimate energy)

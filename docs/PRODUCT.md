@@ -22,7 +22,7 @@ Private training lab (DNA → QLoRA → DPO → recipe ratchet → dogfood mutat
 [docs/research/ARENA_LAB.md](research/ARENA_LAB.md) for proven knobs that may
 later inform product defaults — not shipped in the stranger path.
 
-**Optional (Phase 22 product fold v0.2):** Arena can fold local **organ** hints (tag + score + role/metric) via `organs fold`. Copy lands in `data/organ_hints.json` (or set `OBULUS_ORGAN_HINTS`); `obulus.py recommend` shows an extra section. Absent by default — stranger path below does not require Arena. See [ARENA_LAB.md](research/ARENA_LAB.md) and Arena `docs/NORTH_STAR.md`. Still **not** production-ready organ metabolism.
+**Optional (Phase 22 product fold v0.2):** Arena can fold local **organ** hints (tag + score + role/metric) via `organs fold`. Copy lands in `data/organ_hints.json` (or set `OBULUS_ORGAN_HINTS`); `obulus.py recommend` shows an extra **display-only** section — hints never override `best_overall`. Absent by default — stranger path below does not require Arena. See [ARENA_LAB.md](research/ARENA_LAB.md) and Arena `docs/SHIP_BAR.md`. Organ metabolism stays behind the Arena ship bar.
 
 ## Stranger path
 
