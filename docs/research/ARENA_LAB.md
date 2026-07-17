@@ -62,7 +62,7 @@ Same ladder on `Qwen/Qwen2.5-Coder-1.5B-Instruct` / `qwen2.5-coder:1.5b` (see Ar
 
 ## Future (10× direction — not a ship claim)
 
-Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–11 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1 (`organs export` → optional `data/organ_hints.json` in public recommend). Next: safe apply zone (Phase 12+). Public stranger path stays `make demo` (unchanged when hints absent). Still **not production-ready**.
+Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–12 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1, safe apply zone (`safe-apply` worktree dogfood of real `src/**` — live tree never written). Public stranger path stays `make demo`. Still **not production-ready**.
 
 ### Product fold v0.1 (optional)
 
