@@ -1,11 +1,11 @@
-.PHONY: setup bench evolve recommend compare suites test clean help
+.PHONY: setup demo bench bench-full evolve recommend compare suites test clean help
 
 PYTHON = .venv/bin/python3
 VENV = .venv
 
 help: ## Show this help
 	@echo ""
-	@echo "  ⚡ OBULUS — Intelligence per Watt"
+	@echo "  OBULUS — best local model per joule"
 	@echo ""
 	@echo "  Usage: make <command>"
 	@echo ""
@@ -18,28 +18,37 @@ $(VENV)/bin/activate:
 
 setup: $(VENV)/bin/activate ## Create venv and install dependencies
 	@echo ""
-	@echo "  ✅ Setup complete. Run 'make bench' to start."
+	@echo "  Setup complete. Run 'make demo' (or 'make bench')."
 	@echo ""
 	@if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then \
-		echo "  ⚠️  Ollama is not running. Start it with: ollama serve"; \
-		echo "  📦 Then pull a model: ollama pull qwen2.5-coder:7b"; \
+		echo "  Ollama is not running. Start it with: ollama serve"; \
+		echo "  Then pull a model: ollama pull qwen2.5-coder:7b"; \
 		echo ""; \
 	fi
 
-bench: $(VENV)/bin/activate ## Benchmark a model (auto-detects first available)
-	@MODEL=$$(curl -s http://localhost:11434/api/tags 2>/dev/null | $(PYTHON) -c "import sys,json;d=json.load(sys.stdin);ms=[m['name'] for m in d.get('models',[]) if 'embed' not in m['name']];print(ms[0] if ms else '')" 2>/dev/null); \
+_detect_model = \
+	MODEL=$$(curl -s http://localhost:11434/api/tags 2>/dev/null | $(PYTHON) -c "import sys,json;d=json.load(sys.stdin);ms=[m['name'] for m in d.get('models',[]) if 'embed' not in m['name']];print(ms[0] if ms else '')" 2>/dev/null); \
 	if [ -z "$$MODEL" ]; then \
-		echo "  ❌ No Ollama models found. Run: ollama pull qwen2.5-coder:7b"; \
+		echo "  No Ollama models found. Run: ollama pull qwen2.5-coder:7b"; \
 		exit 1; \
 	fi; \
-	echo "  🔍 Auto-detected model: $$MODEL"; \
+	echo "  Auto-detected model: $$MODEL"
+
+demo: $(VENV)/bin/activate ## Stranger path: math bench → recommend
+	@$(_detect_model); \
+	$(PYTHON) obulus.py bench --model "$$MODEL" --suite math; \
+	$(PYTHON) obulus.py recommend
+
+bench: $(VENV)/bin/activate ## Benchmark a model (auto-detects first available)
+	@$(_detect_model); \
 	$(PYTHON) obulus.py bench --model "$$MODEL" --suite math
 
 bench-full: $(VENV)/bin/activate ## Benchmark all suites
-	@MODEL=$$(curl -s http://localhost:11434/api/tags 2>/dev/null | $(PYTHON) -c "import sys,json;d=json.load(sys.stdin);ms=[m['name'] for m in d.get('models',[]) if 'embed' not in m['name']];print(ms[0] if ms else '')" 2>/dev/null); \
+	@$(_detect_model); \
 	$(PYTHON) obulus.py bench --model "$$MODEL" --suite full
 
-evolve: $(VENV)/bin/activate ## Run evolutionary arena (auto-discovers all models)
+evolve: $(VENV)/bin/activate ## Experimental: evolutionary arena
+	@echo "  Note: evolve is experimental — not part of the v1 product surface."
 	$(PYTHON) obulus.py evolve
 
 recommend: $(VENV)/bin/activate ## Show model recommendations & cost projections
@@ -57,4 +66,4 @@ test: $(VENV)/bin/activate ## Run all tests
 
 clean: ## Remove generated data and caches
 	rm -rf data/*.json __pycache__ src/**/__pycache__
-	@echo "  🧹 Cleaned generated data and caches."
+	@echo "  Cleaned generated data and caches."

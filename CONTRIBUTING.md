@@ -6,7 +6,7 @@ Thanks for your interest in Obolus! Here's how you can contribute.
 
 ```bash
 git clone https://github.com/maximilianwruhs-cyber/Obolus.git
-cd obulus
+cd Obolus
 make setup
 make test
 ```
@@ -27,11 +27,12 @@ ollama pull <model-name>
 make bench
 ```
 
-### Improve the Fitness Scorer
-The scoring engine lives in `src/benchmark/fitness_scorer.py`. The z-score formula is:
+### Scoring
+Product ranking (`bench` / `recommend`) uses:
 ```
-z = (Quality × Efficiency) × (1 − Variance)
+z = quality / (joules × price_factor)
 ```
+with `price_factor = max(0.01, ¢/kWh / 25)`. The evolve path has a separate experimental fitness formula in `src/benchmark/fitness_scorer.py`.
 
 ### Report Bugs
 Open an issue with:

@@ -4,7 +4,7 @@ import os
 import config
 
 
-class GZMOThermalGovernor:
+class ThermalGovernor:
     """
     Elastic Grid Governor.
     Ensures all agents can run simultaneously by dynamically splitting capacity.

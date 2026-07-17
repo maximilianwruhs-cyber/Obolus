@@ -23,8 +23,13 @@ DATA_DIR.mkdir(exist_ok=True)
 
 # ─── Ollama ───────────────────────────────────────────────────────────────────
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-DEFAULT_MODEL = os.getenv("OBULUS_MODEL", "llama3:latest")
+DEFAULT_MODEL = os.getenv("OBULUS_MODEL", "qwen2.5-coder:7b")
 
-# ─── Arena Defaults ───────────────────────────────────────────────────────────
+# ─── Electricity (offline-first) ──────────────────────────────────────────────
+# price_source: "offline" (default) uses ELECTRICITY_C_KWH; "awattar" fetches live spot.
+ELECTRICITY_C_KWH = float(os.getenv("OBULUS_ELECTRICITY_C_KWH", "25.0"))
+PRICE_SOURCE = os.getenv("OBULUS_PRICE_SOURCE", "offline").strip().lower()
+
+# ─── Arena Defaults (experimental evolve path) ────────────────────────────────
 TOTAL_TOKENS_PER_ROUND = int(os.getenv("OBULUS_TOKENS_PER_ROUND", "2048"))
 INITIAL_AGENT_BALANCE = float(os.getenv("OBULUS_INITIAL_BALANCE", "100.0"))

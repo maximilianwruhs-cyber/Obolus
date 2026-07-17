@@ -17,7 +17,7 @@ import requests
 from src.benchmark.task_suite import get_suite, list_suites
 from src.benchmark.evaluator import score_task
 from src.benchmark.energy_meter import EnergyMeter
-from src.benchmark.awattar import get_price_or_default
+from src.benchmark.awattar import resolve_price
 
 
 def infer(model: str, prompt: str, ollama_url: str, temperature: float = 0.3) -> tuple[str, int, float]:
@@ -46,14 +46,20 @@ def run_benchmark(model: str, suite: str = "full", ollama_url: str = None,
     tasks = get_suite(suite)
     timestamp = datetime.now().isoformat()
     meter = EnergyMeter()
-    price_c_kwh = get_price_or_default()
+    price_c_kwh, price_is_live = resolve_price()
+    energy_source = "rapl" if meter.rapl_available else "estimate"
+    price_label = (
+        f"LIVE {price_c_kwh:.1f} ¢/kWh"
+        if price_is_live
+        else f"{price_c_kwh:.1f} ¢/kWh (offline)"
+    )
 
     if verbose:
         print(f"\n{'='*60}")
-        print(f"  OBOLUS BENCHMARK — {model}")
+        print(f"  OBULUS BENCHMARK — {model}")
         print(f"  Suite: {suite} ({len(tasks)} tasks) | {timestamp}")
-        print(f"  Energy: {'RAPL (real watts)' if meter.rapl_available else 'estimate (no RAPL)'}")
-        print(f"  Electricity: {price_c_kwh:.1f} ¢/kWh")
+        print(f"  Energy: {energy_source} ({'real watts' if energy_source == 'rapl' else 'no RAPL'})")
+        print(f"  Electricity: {price_label}")
         print(f"{'='*60}\n")
 
     results = []
@@ -95,7 +101,7 @@ def run_benchmark(model: str, suite: str = "full", ollama_url: str = None,
     tokens_per_task = total_tokens / n if n > 0 else 0
 
     joules_per_token = total_joules / max(1, total_tokens)
-    # z = quality / (joules × price_factor) — Intelligence per Watt per Euro
+    # Product z: quality / (joules × price_factor) — higher is better
     price_factor = max(0.01, price_c_kwh / 25.0)  # normalize around 25 ¢/kWh
     z_score = avg_score / max(0.001, total_joules * price_factor) if avg_score > 0 else 0
     obl_cost = EnergyMeter.joules_to_obl(total_joules)
@@ -118,7 +124,8 @@ def run_benchmark(model: str, suite: str = "full", ollama_url: str = None,
         "obl_cost": round(obl_cost, 6),
         "eur_cost": round(eur_cost, 8),
         "electricity_c_kwh": round(price_c_kwh, 2),
-        "energy_source": meter.rapl_available and "rapl" or "estimate",
+        "price_is_live": price_is_live,
+        "energy_source": energy_source,
         "scores_by_type": {},
         "results": results,
     }
@@ -140,9 +147,9 @@ def run_benchmark(model: str, suite: str = "full", ollama_url: str = None,
         print(f"{'─'*60}")
         print(f"  Quality:    {avg_score:.2%}")
         print(f"  Energy:     {total_joules:.2f} J ({joules_per_token:.4f} J/tok)")
-        print(f"  z-score:    {z_score:.6f} (quality / joule×price — higher is better)")
-        print(f"  $OBL cost:  {obl_cost:.6f} OBL")
-        print(f"  EUR cost:   €{eur_cost:.8f} @ {price_c_kwh:.1f} ¢/kWh")
+        print(f"  z-score:    {z_score:.6f} (quality / joules×price — higher is better)")
+        print(f"  Energy src: {energy_source}")
+        print(f"  EUR cost:   €{eur_cost:.8f} @ {price_label}")
         print(f"  Tokens:     {total_tokens} total ({tokens_per_task:.0f}/task)")
         print(f"  Speed:      {summary['tokens_per_second']:.1f} tok/s")
         print(f"  Time:       {total_time:.1f}s")

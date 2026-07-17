@@ -23,7 +23,7 @@ from src.benchmark.fitness_scorer import (
 )
 from src.benchmark.leaderboard import MutationLeaderboard
 from src.benchmark.model_discovery import discover_models, print_discovered_models
-from src.benchmark.awattar import get_current_price_c_kwh
+from src.benchmark.awattar import resolve_price
 
 
 # Default scoring config
@@ -137,17 +137,19 @@ def run_arena(epochs: int = 20, suite: str = "full", verbose: bool = True,
             MinerAgent("Gamma", Genome("You are a logic engine. Prioritize correctness over verbosity.", config.DEFAULT_MODEL, 0.4), 50.0),
         ]
 
-    # --- Live Electricity Price ---
-    live_price = get_current_price_c_kwh()
-    price_c_kwh = live_price if live_price is not None else 25.0
-    price_is_live = live_price is not None
+    # --- Electricity price (offline by default; awattar opt-in) ---
+    price_c_kwh, price_is_live = resolve_price()
 
     # Economic pressure: expensive electricity → stricter scoring
     # Cheap/negative → bonus headroom, expensive → tighter thresholds
     econ_factor = max(0.5, min(2.0, price_c_kwh / 15.0))  # normalize around 15¢
 
     if verbose:
-        price_label = f"LIVE {price_c_kwh:.1f} ¢/kWh" if price_is_live else f"est. {price_c_kwh:.1f} ¢/kWh"
+        price_label = (
+            f"LIVE {price_c_kwh:.1f} ¢/kWh"
+            if price_is_live
+            else f"{price_c_kwh:.1f} ¢/kWh (offline)"
+        )
         if price_is_live:
             if price_c_kwh < 0:
                 icon = "🎉"
@@ -166,7 +168,7 @@ def run_arena(epochs: int = 20, suite: str = "full", verbose: bool = True,
                 context = "Expensive — efficiency critical"
         else:
             icon = "📊"
-            context = "API unavailable, using estimate"
+            context = "offline price (set OBULUS_PRICE_SOURCE=awattar for live)"
 
         print(f"\n--- OBOLUS EVO-GRID ARENA v4 (Multi-Model) ---")
         print(f"    {icon} Electricity: {price_label} ({context})")

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-Obolus CLI — Intelligence per Watt
+Obolus CLI — best local model per joule
 Usage:
-    python obulus.py bench  --model llama3 --suite full
+    python obulus.py bench --model qwen2.5-coder:7b --suite math
+    python obulus.py recommend
     python obulus.py compare
-    python obulus.py suites
-    python obulus.py evolve --agents firewall_agent.md docker_architect.md
 """
 import sys
 import argparse
@@ -45,7 +44,8 @@ def cmd_suites(args):
 
 
 def cmd_evolve(args):
-    """Run the evolutionary arena with benchmark scoring."""
+    """Experimental evolutionary arena (not v1 product surface)."""
+    print("\n  Note: evolve is experimental — prefer `bench` then `recommend`.\n")
     from src.simulation.arena import run_arena
     run_arena(
         epochs=args.epochs,
@@ -62,24 +62,23 @@ def cmd_recommend(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Obolus — Intelligence per Watt",
+        description="Obolus — which local model is best per joule on your machine",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python obulus.py bench --model llama3:8b --suite math
-  python obulus.py bench --model qwen2.5:7b --suite full
+  python obulus.py bench --model qwen2.5-coder:7b --suite math
+  python obulus.py recommend
   python obulus.py compare
-  python obulus.py evolve --agents firewall_agent.md
         """,
     )
     sub = parser.add_subparsers(dest="command")
 
     # bench
     bench = sub.add_parser("bench", help="Benchmark a model (quality + energy)")
-    bench.add_argument("--model", required=True, help="Ollama model name (e.g. llama3:8b)")
-    bench.add_argument("--suite", default="full",
+    bench.add_argument("--model", required=True, help="Ollama model name (e.g. qwen2.5-coder:7b)")
+    bench.add_argument("--suite", default="math",
                        choices=list(list_suites().keys()),
-                       help="Task suite (default: full)")
+                       help="Task suite (default: math)")
     bench.add_argument("--ollama-url", default=None, help="Ollama URL (default: from .env)")
     bench.add_argument("--temperature", type=float, default=0.3)
     bench.add_argument("--quiet", action="store_true", help="Suppress per-task output")
@@ -93,8 +92,8 @@ Examples:
     s = sub.add_parser("suites", help="List available task suites")
     s.set_defaults(func=cmd_suites)
 
-    # evolve
-    evo = sub.add_parser("evolve", help="Run evolutionary arena")
+    # evolve (experimental)
+    evo = sub.add_parser("evolve", help="Experimental: evolutionary arena")
     evo.add_argument("--agents", nargs="*", default=None, help="Agent .md filenames")
     evo.add_argument("--ollama-url", default=None, help="Ollama URL")
     evo.add_argument("--suite", default="math", choices=list(list_suites().keys()),
@@ -113,7 +112,7 @@ Examples:
 
     if not args.command:
         parser.print_help()
-        print("\n  💡 Quick start: python obulus.py bench --model llama3:8b --suite math\n")
+        print("\n  Quick start: python obulus.py bench --model qwen2.5-coder:7b --suite math\n")
         sys.exit(0)
 
     args.func(args)

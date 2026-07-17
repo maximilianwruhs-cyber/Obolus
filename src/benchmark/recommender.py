@@ -1,7 +1,7 @@
 """
 Obolus — Recommender
 Analyzes benchmark results to recommend the best model per task type
-and project costs at different scales using LIVE electricity pricing.
+and project costs at different scales (offline price by default).
 """
 import json
 from pathlib import Path
@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Optional
 
 import config
-from src.benchmark.awattar import get_current_price_c_kwh, get_price_or_default
+from src.benchmark.awattar import resolve_price
 
 
 # Cloud API reference costs (USD per 1M tokens, approximate 2026 pricing)
@@ -70,16 +70,13 @@ def cloud_equivalent(tokens_per_run: int, queries_per_day: int) -> dict:
 def recommend(results: list = None) -> Optional[dict]:
     """
     Analyze benchmark results and produce recommendations.
-    Uses LIVE electricity pricing from aWATTar for cost projections.
+    Uses offline electricity price by default; live only when configured.
     """
     results = results if results is not None else load_results()
     if not results:
         return None
 
-    # Fetch live electricity price
-    live_price = get_current_price_c_kwh()
-    price_c_kwh = live_price if live_price is not None else 25.0
-    price_is_live = live_price is not None
+    price_c_kwh, price_is_live = resolve_price()
 
     # Find best model per task type by z-score
     best_by_type = {}
@@ -118,7 +115,7 @@ def recommend(results: list = None) -> Optional[dict]:
     if not best_overall:
         return None
 
-    # Cost projections using LIVE electricity price
+    # Cost projections using resolved electricity price
     joules_per_query = best_overall["total_joules"] / max(1, best_overall["total_tasks"])
     tokens_per_query = best_overall["total_tokens"] // max(1, best_overall["total_tasks"])
 
@@ -142,10 +139,10 @@ def recommend(results: list = None) -> Optional[dict]:
 
 
 def print_recommendation(rec: dict = None):
-    """Pretty-print the recommendation with live energy pricing."""
+    """Pretty-print the recommendation with electricity labeling."""
     rec = rec or recommend()
     if not rec:
-        print("\n  No benchmark results found. Run `obulus bench --model <model> --suite full` first.\n")
+        print("\n  No benchmark results found. Run `make demo` or `obulus.py bench --suite math` first.\n")
         return
 
     best = rec["best_overall"]
@@ -156,7 +153,7 @@ def print_recommendation(rec: dict = None):
     is_live = rec["price_is_live"]
     timestamp = rec.get("timestamp", "")
 
-    price_label = f"LIVE {price:.1f} ¢/kWh" if is_live else f"est. {price:.1f} ¢/kWh"
+    price_label = f"LIVE {price:.1f} ¢/kWh" if is_live else f"{price:.1f} ¢/kWh (offline)"
     price_icon = "⚡" if is_live else "📊"
 
     print()

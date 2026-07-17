@@ -1,31 +1,29 @@
 # Obolus Roadmap
 
-## ✅ Phase 1 — Local Benchmark (Complete)
+## ✅ v0.1 — Local model economics (shipped)
+
 - Single-model benchmarking (quality + energy)
-- Intel RAPL energy measurement with psutil fallback
-- Math, code, factual, and reasoning task suites
-- z-score: quality per joule
-- AWS/aWATTar live electricity pricing
+- Intel RAPL measurement with CPU×TDP estimate fallback (labeled)
+- Math / code / factual / reasoning task suites
+- Product z-score: `quality / (joules × price_factor)`
+- Offline electricity price by default; aWATTar opt-in
+- Recommender with cost projections vs cloud APIs
+- Stranger path: `make setup` → `make demo`
 
-## ✅ Phase 2 — Evolutionary Engine (Complete)
-- Multi-trial fitness scoring (quality × efficiency × (1 − variance))
-- Evolutionary arena with mutation and crossover
-- The Forge: system prompt mutation via Meta-LLM
-- Persistent mutation leaderboard
-- Multi-model competition (auto-discovers all Ollama models)
-- Model mutation (Forge can downgrade/upgrade model size)
-- Live energy pricing integrated into fitness scoring
-- Model recommender with cost projections vs cloud APIs
+## Experimental (not v1 product)
 
-## 🔜 Phase 3 — Applied Intelligence
-- [ ] Smart model router (auto-route queries to cheapest qualifying model)
-- [ ] Real-world task suites (summarization, JSON extraction, code refactoring)
+- Evolutionary arena / Forge / multi-model mutation
+- Separate fitness formula in `fitness_scorer.py`
+- Integration hooks (sensorium, thermal governor, dashboard)
+
+## 🔜 Next
+
+- [ ] Smart model router (cheapest model that meets a quality bar)
+- [ ] Real-world task suites (summarization, JSON extraction, refactor)
 - [ ] Hardware-specific optimization profiles
-- [ ] Web dashboard for visualization
+- [ ] Optional local dashboard for visualization
 - [ ] Export as Ollama Modelfile with optimized parameters
 
-## 🔮 Phase 4 — Decentralized Network
-- [ ] Bittensor subnet integration
-- [ ] Distributed agent competition across machines
-- [ ] On-chain mutation leaderboard
-- [ ] Economic incentive layer for efficient inference
+## Later (maybe)
+
+- Decentralized / on-chain leaderboard — only if it stays true to local economics

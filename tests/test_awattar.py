@@ -1,16 +1,20 @@
 """
-Tests for Obolus aWATTar Bridge — price parsing, fallback, negative prices.
+Tests for Obolus electricity price resolution — offline-first + optional aWATTar.
 Uses mocked HTTP responses (no API calls).
 """
 import sys
-import json
 import time
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.benchmark.awattar import get_current_price_c_kwh, get_price_or_default
+import config
+from src.benchmark.awattar import (
+    get_current_price_c_kwh,
+    get_price_or_default,
+    resolve_price,
+)
 
 
 def _mock_awattar_response(market_price_eur_mwh, now_ms=None):
@@ -32,75 +36,89 @@ def _mock_awattar_response(market_price_eur_mwh, now_ms=None):
 
 def test_normal_price():
     """Normal positive price conversion: €/MWh → ¢/kWh."""
-    # 50 €/MWh = 5.0 ¢/kWh
     with patch("src.benchmark.awattar.requests.get", return_value=_mock_awattar_response(50.0)):
         price = get_current_price_c_kwh()
     assert price == 5.0
-    print("  ✅ PASS: normal price (50 €/MWh = 5.0 ¢/kWh)")
 
 
 def test_expensive_price():
-    """High price."""
-    # 250 €/MWh = 25.0 ¢/kWh
     with patch("src.benchmark.awattar.requests.get", return_value=_mock_awattar_response(250.0)):
         price = get_current_price_c_kwh()
     assert price == 25.0
-    print("  ✅ PASS: expensive price (250 €/MWh = 25.0 ¢/kWh)")
 
 
 def test_negative_price():
-    """Negative prices happen when grid has excess renewable supply."""
-    # -20 €/MWh = -2.0 ¢/kWh
     with patch("src.benchmark.awattar.requests.get", return_value=_mock_awattar_response(-20.0)):
         price = get_current_price_c_kwh()
     assert price == -2.0
-    print("  ✅ PASS: negative price (-20 €/MWh = -2.0 ¢/kWh)")
 
 
 def test_zero_price():
-    """Zero price."""
     with patch("src.benchmark.awattar.requests.get", return_value=_mock_awattar_response(0.0)):
         price = get_current_price_c_kwh()
     assert price == 0.0
-    print("  ✅ PASS: zero price")
 
 
 def test_api_failure_returns_none():
-    """Should return None when API is unreachable."""
     with patch("src.benchmark.awattar.requests.get", side_effect=Exception("Timeout")):
         price = get_current_price_c_kwh()
     assert price is None
-    print("  ✅ PASS: API failure returns None")
 
 
-def test_get_price_or_default_uses_live():
-    """Should use live price when available."""
-    with patch("src.benchmark.awattar.requests.get", return_value=_mock_awattar_response(46.0)):
+def test_resolve_offline_default_skips_network():
+    """Offline (default) must not call the network."""
+    with patch.object(config, "PRICE_SOURCE", "offline"), \
+         patch.object(config, "ELECTRICITY_C_KWH", 25.0), \
+         patch("src.benchmark.awattar.requests.get") as mock_get:
+        price, is_live = resolve_price()
+    assert price == 25.0
+    assert is_live is False
+    mock_get.assert_not_called()
+
+
+def test_resolve_awattar_uses_live():
+    with patch.object(config, "PRICE_SOURCE", "awattar"), \
+         patch.object(config, "ELECTRICITY_C_KWH", 25.0), \
+         patch("src.benchmark.awattar.requests.get", return_value=_mock_awattar_response(46.0)):
+        price, is_live = resolve_price()
+    assert price == 4.6
+    assert is_live is True
+
+
+def test_resolve_awattar_fallback():
+    with patch.object(config, "PRICE_SOURCE", "awattar"), \
+         patch.object(config, "ELECTRICITY_C_KWH", 25.0), \
+         patch("src.benchmark.awattar.requests.get", side_effect=Exception("Error")):
+        price, is_live = resolve_price()
+    assert price == 25.0
+    assert is_live is False
+
+
+def test_get_price_or_default_respects_offline():
+    with patch.object(config, "PRICE_SOURCE", "offline"), \
+         patch.object(config, "ELECTRICITY_C_KWH", 25.0), \
+         patch("src.benchmark.awattar.requests.get") as mock_get:
+        price = get_price_or_default()
+    assert price == 25.0
+    mock_get.assert_not_called()
+
+
+def test_get_price_or_default_awattar_live():
+    with patch.object(config, "PRICE_SOURCE", "awattar"), \
+         patch("src.benchmark.awattar.requests.get", return_value=_mock_awattar_response(46.0)):
         price = get_price_or_default(default_c_kwh=25.0)
     assert price == 4.6
-    print("  ✅ PASS: get_price_or_default uses live")
-
-
-def test_get_price_or_default_fallback():
-    """Should use default when API fails."""
-    with patch("src.benchmark.awattar.requests.get", side_effect=Exception("Error")):
-        price = get_price_or_default(default_c_kwh=25.0)
-    assert price == 25.0
-    print("  ✅ PASS: get_price_or_default fallback")
 
 
 def test_empty_data():
-    """Should handle empty data array."""
     mock = MagicMock()
     mock.json.return_value = {"data": []}
     with patch("src.benchmark.awattar.requests.get", return_value=mock):
         price = get_current_price_c_kwh()
     assert price is None
-    print("  ✅ PASS: empty data array")
 
 
 def test_no_matching_period():
-    """Should return latest entry when no period matches current time."""
     mock = MagicMock()
     mock.json.return_value = {
         "data": [
@@ -110,20 +128,4 @@ def test_no_matching_period():
     }
     with patch("src.benchmark.awattar.requests.get", return_value=mock):
         price = get_current_price_c_kwh()
-    # Should fall back to latest entry: 150 €/MWh = 15.0 ¢/kWh
     assert price == 15.0
-    print("  ✅ PASS: no matching period — uses latest")
-
-
-if __name__ == "__main__":
-    print("\n=== Obolus aWATTar Tests ===\n")
-    test_normal_price()
-    test_expensive_price()
-    test_negative_price()
-    test_zero_price()
-    test_api_failure_returns_none()
-    test_get_price_or_default_uses_live()
-    test_get_price_or_default_fallback()
-    test_empty_data()
-    test_no_matching_period()
-    print("\n=== All aWATTar tests passed! ===\n")

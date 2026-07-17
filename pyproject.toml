@@ -1,7 +1,7 @@
 [project]
 name = "obulus"
-version = "1.0.0"
-description = "Maximizing Intelligence per Watt — An evolutionary AI arena where agents compete, mutate, and evolve."
+version = "0.1.0"
+description = "Which local model gives you the best answers per joule on your machine."
 requires-python = ">=3.10"
 dependencies = [
     "requests>=2.31",
@@ -15,3 +15,17 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "ruff"]
+
+[project.scripts]
+obulus = "obulus:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["obulus", "config"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

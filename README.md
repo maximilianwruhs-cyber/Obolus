@@ -1,172 +1,116 @@
-# ⚡ Obolus
+# Obolus
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![Part of: AgenticOS](https://img.shields.io/badge/ecosystem-AgenticOS-blue)](https://github.com/maximilianwruhs-cyber)
 
-> **Maximizing Intelligence per Watt.**
+> **Which local model gives you the best answers per joule on your machine.**
 
-Obolus measures how much intelligence you get per watt of energy — on **your** hardware, with **your** models, at **your** electricity price.
+Obolus benchmarks your [Ollama](https://ollama.com) models for quality and energy — on **your** hardware, at **your** electricity price — then recommends the winner.
 
 ```
-z = (Quality × Efficiency) × (1 − Variance)
+z = quality / (joules × price_factor)
 ```
+
+`price_factor` is normalized around 25 ¢/kWh. Higher z is better.
 
 Every other benchmark answers: *"How smart is this model?"*  
-Obolus answers: **"Which model gives me the best results for the least energy on my machine?"**
+Obolus answers: **"Which model is worth running here, given energy and price?"**
 
-## Quick Start
+## Quick start (≈10 minutes)
+
+**Prerequisites:** [Python 3.10+](https://www.python.org/) and [Ollama](https://ollama.com) with at least one chat model (`ollama pull qwen2.5-coder:7b`).
 
 ```bash
-# 1. Clone and setup
 git clone https://github.com/maximilianwruhs-cyber/Obolus.git
-cd obulus
+cd Obolus
 make setup
+make demo          # math suite → recommend
+```
 
-# 2. Run a benchmark (auto-detects your Ollama models)
-make bench
+Or step by step:
 
-# 3. See recommendations
+```bash
+make bench         # auto-detects first non-embed Ollama model
 make recommend
 ```
 
-> **Prerequisites:** [Python 3.10+](https://python.org) and [Ollama](https://ollama.ai) with at least one model pulled (`ollama pull qwen2.5-coder:7b`).
+One-liner (clone + setup + demo):
 
-## What You Get
-
-### Model Recommendations with Live Energy Pricing
-```
-  ╔══════════════════════════════════════════════════════════════╗
-  ║  OBOLUS RECOMMENDATION — Your Hardware Profile              ║
-  ╠══════════════════════════════════════════════════════════════╣
-  ║  ⚡ Electricity: LIVE 4.6 ¢/kWh                             ║
-  ║  🟢 Very cheap — great time for heavy inference             ║
-  ║                                                              ║
-  ║  🏆 Best Overall: qwen2.5-coder:1.5b            z=0.1846   ║
-  ║     Quality: 80.0%  |  Energy: 23.4J                       ║
-  ║                                                              ║
-  ║  💰 enterprise (10000 q/day)      €0.0060/mo   €0.07/yr    ║
-  ║  ☁️  Claude 3.5                   $2.16/mo   (saves 100%)  ║
-  ╚══════════════════════════════════════════════════════════════╝
+```bash
+curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/Obolus/main/scripts/install-obolus.sh | bash
 ```
 
-### Evolutionary Arena
-Models compete head-to-head. The Forge mutates losers — changing system prompts *and* model size — until only the most efficient survive.
+## What you get
 
 ```
-  ⚡ Electricity: LIVE 4.6 ¢/kWh (Very cheap — full power)
+  Energy: RAPL (real watts) | or estimate (no RAPL)
+  Electricity: 25.0 ¢/kWh (offline default)
 
-  🟢 qwen2.5-coder:1.5b  z=14.0  Q=0.84  E=16.6  ✅
-  🟡 qwen2.5-coder:7b    z=1.5   Q=0.67  E=2.2   ✅
-  
-  [CONVERGED] 1.5b wins — 80% quality at half the energy.
+  🏆 Best Overall: qwen2.5-coder:1.5b            z=0.1846
+     Quality: 80.0%  |  Energy: 23.4J
 ```
+
+Cost projections use your configured ¢/kWh (offline by default). Live spot pricing is opt-in.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
 | `make setup` | Create venv and install dependencies |
-| `make bench` | Benchmark with auto-detected model |
+| `make demo` | Short stranger path: math bench → recommend |
+| `make bench` | Benchmark auto-detected model (`math` suite) |
 | `make bench-full` | Benchmark all task suites |
-| `make evolve` | Run evolutionary multi-model arena |
-| `make recommend` | Show model recommendations + costs |
-| `make compare` | Compare results across models |
-| `make test` | Run all tests |
+| `make recommend` | Show model recommendations + cost projections |
+| `make compare` | Leaderboard from saved results |
+| `make suites` | List suite sizes |
+| `make test` | Run unit tests |
 | `make clean` | Remove generated data |
 
-Or use the CLI directly:
+CLI:
+
 ```bash
-python obulus.py bench --model qwen2.5-coder:7b --suite math
-python obulus.py evolve --epochs 20 --patience 5
-python obulus.py recommend
+.venv/bin/python obulus.py bench --model qwen2.5-coder:7b --suite math
+.venv/bin/python obulus.py recommend
+.venv/bin/python obulus.py compare
 ```
 
-## How It Works
+## How it works
 
-### Benchmark
-Runs verifiable tasks (math, code, factual, reasoning) against your local model via Ollama, measuring both **quality** (correctness) and **energy** (joules via Intel RAPL or CPU load estimate).
+1. **Bench** — runs verifiable tasks (math, code, factual, reasoning) via Ollama; measures quality and joules (Intel RAPL when available, otherwise CPU×TDP estimate).
+2. **Score** — `z = quality / (joules × price_factor)` with `price_factor = max(0.01, ¢/kWh / 25)`.
+3. **Recommend** — picks the best saved run and projects €/mo at personal / team / enterprise query rates.
 
-### Fitness Scorer
-The evolutionary fitness formula:
-- **Q (Quality)** = 0.5 × pass_rate + 0.3 × time_score + 0.2 × similarity
-- **E (Efficiency)** = baseline_energy / actual_energy
-- **V (Variance)** = coefficient of variation across trials
-- **z = (Q × E) × (1 − V)**
+See [docs/PRODUCT.md](docs/PRODUCT.md) for goals and non-goals.
 
-### Evolutionary Arena
-1. Auto-discovers all Ollama models
-2. Spawns one agent per model with diverse system prompts
-3. Each epoch: multi-trial evaluation → fitness scoring → approval
-4. Failed agents are reborn in the **Forge** with mutated prompts/models
-5. Convergence detection stops early when no improvement
+## Energy measurement
 
-### Live Energy Pricing
-Fetches real-time electricity spot prices from [aWATTar](https://www.awattar.at/) (Austrian energy market). When electricity is expensive, agents earn fewer rewards — creating genuine economic pressure for efficiency.
+Intel RAPL (optional):
 
-## Project Structure
-
-```
-obulus/
-├── obulus.py                  # CLI entry point
-├── config.py                  # Configuration (env-based)
-├── Makefile                   # One-command workflows
-│
-├── src/
-│   ├── benchmark/
-│   │   ├── runner.py          # Benchmark orchestrator
-│   │   ├── task_suite.py      # 30 verifiable tasks
-│   │   ├── evaluator.py       # Multi-strategy scorer
-│   │   ├── energy_meter.py    # Intel RAPL / CPU load energy
-│   │   ├── fitness_scorer.py  # Evolutionary fitness (z-score)
-│   │   ├── recommender.py     # Model recommendations + costs
-│   │   ├── model_discovery.py # Auto-discover Ollama models
-│   │   ├── leaderboard.py     # Persistent mutation leaderboard
-│   │   └── awattar.py         # Live electricity pricing
-│   ├── core/                  # Agent primitives (genome, wallet, brain)
-│   ├── simulation/            # Arena, forge, validators
-│   └── integration/           # Hardware sensorium
-│
-├── agents/                    # Agent DNA files (system prompts)
-├── tools/                     # Agent-invocable tools
-├── tests/                     # Unit tests
-├── docs/                      # Scientific foundations & concept
-└── data/                      # Runtime state (gitignored)
-```
-
-## Energy Measurement
-
-Obolus uses **Intel RAPL** (Running Average Power Limit) for real energy measurement:
 ```bash
 sudo chmod a+r /sys/class/powercap/intel-rapl:0/energy_uj
 ```
-Without RAPL access, it falls back to a CPU load × TDP estimate.
 
-## Configuration
+Without RAPL, Obolus uses an estimate and labels the run `energy_source: estimate`.
 
-Copy `.env.example` to `.env` and customize:
+## Electricity price
+
+| Mode | How |
+|------|-----|
+| **Offline (default)** | `OBULUS_ELECTRICITY_C_KWH=25` — no network |
+| **Live (opt-in)** | `OBULUS_PRICE_SOURCE=awattar` — [aWATTar](https://www.awattar.at/) AT spot, then fallback |
+
+Copy `.env.example` → `.env` to customize.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `OLLAMA_URL` | `http://localhost:11434` | Ollama API endpoint |
-| `OBULUS_MODEL` | `qwen2.5-coder:7b` | Default model (overridden by auto-discovery) |
-| `OBULUS_INITIAL_BALANCE` | `100.0` | Starting $OBL per agent |
+| `OLLAMA_URL` | `http://localhost:11434` | Ollama API |
+| `OBULUS_MODEL` | `qwen2.5-coder:7b` | Default model when not auto-detected |
+| `OBULUS_ELECTRICITY_C_KWH` | `25` | Offline ¢/kWh |
+| `OBULUS_PRICE_SOURCE` | `offline` | `offline` or `awattar` |
 
-## Contributing
+## Experimental
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## AgenticOS Ecosystem
-
-| Project | Description |
-|---------|-------------|
-| [**AOS**](https://github.com/maximilianwruhs-cyber/AOS) | Sovereign AI layer for Ubuntu — the brain of the ecosystem |
-| [**AOS Customer Edition**](https://github.com/maximilianwruhs-cyber/AOS-Customer-Edition) | Zero-touch deployment — one `curl` command installs everything |
-| [**AOS Intelligence Dashboard**](https://github.com/maximilianwruhs-cyber/AOS-Intelligence-Dashboard) | VS Codium extension for real-time energy monitoring & LLM leaderboard |
-| [**HSP**](https://github.com/maximilianwruhs-cyber/HSP) | Hardware Sonification Pipeline — turn machine telemetry into music |
-| [**HSP VS Codium Extension**](https://github.com/maximilianwruhs-cyber/HSP-VS-Codium-Extension) | VS Codium sidebar for live HSP telemetry visualization |
+`make evolve` / `obulus.py evolve` is an experimental multi-model arena. It is **not** part of the v1 product surface. Prefer `bench` → `recommend`.
 
 ## License
 
