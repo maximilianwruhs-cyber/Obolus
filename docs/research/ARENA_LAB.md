@@ -62,7 +62,17 @@ Same ladder on `Qwen/Qwen2.5-Coder-1.5B-Instruct` / `qwen2.5-coder:1.5b` (see Ar
 
 ## Future (10× direction — not a ship claim)
 
-Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–10 done:** mutator gate, organ registry, JSON router, metabolism timer (`metabolize --hours N` — GPU free + artifact budget; no LLM editing `recipe.json`). Next: product fold v0.1 (Phase 11). Public stranger path stays `make demo`. Still **not production-ready**.
+Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–11 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1 (`organs export` → optional `data/organ_hints.json` in public recommend). Next: safe apply zone (Phase 12+). Public stranger path stays `make demo` (unchanged when hints absent). Still **not production-ready**.
+
+### Product fold v0.1 (optional)
+
+```bash
+# In obolus-arena (after scoring answerer organs):
+cargo run -- organs export --out data/organ_hints.json
+cp data/organ_hints.json ../Obolus/data/organ_hints.json
+# In Obolus — recommend shows an extra hints block; make demo still works without the file
+obulus.py recommend
+```
 
 ## Pointers
 

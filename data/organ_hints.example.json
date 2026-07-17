@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "source": "obolus-arena",
+  "exported_at": "example",
+  "hints": [
+    {
+      "ollama_tag": "qwen2.5-coder:1.5b",
+      "z": 0.060674
+    }
+  ]
+}

@@ -33,3 +33,13 @@ PRICE_SOURCE = os.getenv("OBULUS_PRICE_SOURCE", "offline").strip().lower()
 # ─── Arena Defaults (experimental evolve path) ────────────────────────────────
 TOTAL_TOKENS_PER_ROUND = int(os.getenv("OBULUS_TOKENS_PER_ROUND", "2048"))
 INITIAL_AGENT_BALANCE = float(os.getenv("OBULUS_INITIAL_BALANCE", "100.0"))
+
+# ─── Optional Arena organ hints (Phase 11 product fold) ───────────────────────
+# Absent by default: stranger path (make demo) does not require this file.
+# Set OBULUS_ORGAN_HINTS to an absolute/relative path, or place data/organ_hints.json.
+_ORGAN_HINTS_ENV = os.getenv("OBULUS_ORGAN_HINTS", "").strip()
+ORGAN_HINTS_PATH = (
+    Path(_ORGAN_HINTS_ENV).expanduser()
+    if _ORGAN_HINTS_ENV
+    else DATA_DIR / "organ_hints.json"
+)

@@ -12,6 +12,42 @@ import config
 from src.benchmark.awattar import resolve_price
 
 
+def load_organ_hints(path: Path = None) -> Optional[list]:
+    """
+    Optional Arena product-fold hints: [{ollama_tag, z}, ...].
+    Returns None when absent/empty/invalid so stranger recommend is unchanged.
+    """
+    path = path if path is not None else config.ORGAN_HINTS_PATH
+    if not path.exists():
+        return None
+    try:
+        with open(path) as f:
+            payload = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None
+
+    raw = payload.get("hints") if isinstance(payload, dict) else payload
+    if not isinstance(raw, list) or not raw:
+        return None
+
+    hints = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        tag = item.get("ollama_tag") or item.get("tag")
+        z = item.get("z")
+        if not tag or z is None:
+            continue
+        try:
+            hints.append({"ollama_tag": str(tag), "z": float(z)})
+        except (TypeError, ValueError):
+            continue
+    if not hints:
+        return None
+    hints.sort(key=lambda h: h["z"], reverse=True)
+    return hints
+
+
 # Cloud API reference costs (USD per 1M tokens, approximate 2026 pricing)
 CLOUD_COSTS = {
     "gpt-4o":       {"input": 2.50, "output": 10.00},
@@ -127,7 +163,7 @@ def recommend(results: list = None) -> Optional[dict]:
 
     cloud = cloud_equivalent(tokens_per_query, 500)
 
-    return {
+    out = {
         "best_overall": best_overall,
         "best_by_type": best_by_type,
         "cost_projections": scales,
@@ -136,6 +172,11 @@ def recommend(results: list = None) -> Optional[dict]:
         "price_is_live": price_is_live,
         "timestamp": datetime.now().isoformat(),
     }
+    # Optional only — omit key when absent so stranger path stays identical.
+    organ_hints = load_organ_hints()
+    if organ_hints is not None:
+        out["organ_hints"] = organ_hints
+    return out
 
 
 def print_recommendation(rec: dict = None):
@@ -210,5 +251,17 @@ def print_recommendation(rec: dict = None):
     print(f"  ║{' '*62}║")
     print(f"  ║  💡 Local Ollama: €{local_monthly:.4f}/mo @ {price_label:<22}{' '*3}║")
     print(f"  ║{' '*62}║")
+
+    organ_hints = rec.get("organ_hints")
+    if organ_hints:
+        print(f"  ╠{'═'*62}╣")
+        print(f"  ║  🧬 Arena organ hints (optional; experimental){' '*16}║")
+        print(f"  ║{' '*62}║")
+        for hint in organ_hints[:8]:
+            tag = str(hint.get("ollama_tag", "?"))[:28]
+            z = float(hint.get("z", 0.0))
+            print(f"  ║     {tag:<28} z={z:.4f}{' '*17}║")
+        print(f"  ║{' '*62}║")
+
     print(f"  ╚{'═'*62}╝")
     print()

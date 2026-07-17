@@ -6,7 +6,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.benchmark.recommender import project_costs, cloud_equivalent, recommend
+from src.benchmark.recommender import (
+    project_costs,
+    cloud_equivalent,
+    recommend,
+    load_organ_hints,
+)
 
 
 def test_project_costs_basic():
@@ -151,6 +156,73 @@ def test_recommend_picks_best_per_type():
     print("  ✅ PASS: recommend picks best per type")
 
 
+def test_load_organ_hints_absent():
+    """Missing hints file → None (stranger path unchanged)."""
+    assert load_organ_hints(Path("/nonexistent/organ_hints.json")) is None
+    print("  ✅ PASS: load_organ_hints absent")
+
+
+def test_load_organ_hints_valid(tmp_path):
+    """Valid Arena export loads tags + z only."""
+    path = tmp_path / "organ_hints.json"
+    path.write_text(
+        '{"version":1,"hints":[{"ollama_tag":"a:1b","z":0.1},'
+        '{"ollama_tag":"b:7b","z":0.5}]}'
+    )
+    hints = load_organ_hints(path)
+    assert hints is not None
+    assert hints[0]["ollama_tag"] == "b:7b"
+    assert hints[0]["z"] == 0.5
+    print("  ✅ PASS: load_organ_hints valid")
+
+
+def test_recommend_without_hints_omits_key(monkeypatch, tmp_path):
+    """When hints file missing, recommend dict has no organ_hints key."""
+    import config as cfg
+
+    monkeypatch.setattr(cfg, "ORGAN_HINTS_PATH", tmp_path / "missing.json")
+    results = [
+        {
+            "model": "m:1b",
+            "z_score": 1.0,
+            "avg_quality": 0.9,
+            "total_joules": 10.0,
+            "total_tokens": 100,
+            "total_tasks": 5,
+            "scores_by_type": {},
+        }
+    ]
+    rec = recommend(results=results)
+    assert "organ_hints" not in rec
+    print("  ✅ PASS: recommend omits organ_hints when absent")
+
+
+def test_recommend_with_hints_includes_key(monkeypatch, tmp_path):
+    """When hints present, recommend includes organ_hints without changing best_overall."""
+    import config as cfg
+
+    hints_path = tmp_path / "organ_hints.json"
+    hints_path.write_text(
+        '{"version":1,"hints":[{"ollama_tag":"arena-tag:1.5b","z":0.06}]}'
+    )
+    monkeypatch.setattr(cfg, "ORGAN_HINTS_PATH", hints_path)
+    results = [
+        {
+            "model": "m:1b",
+            "z_score": 1.0,
+            "avg_quality": 0.9,
+            "total_joules": 10.0,
+            "total_tokens": 100,
+            "total_tasks": 5,
+            "scores_by_type": {},
+        }
+    ]
+    rec = recommend(results=results)
+    assert rec["best_overall"]["model"] == "m:1b"
+    assert rec["organ_hints"][0]["ollama_tag"] == "arena-tag:1.5b"
+    print("  ✅ PASS: recommend includes organ_hints when present")
+
+
 if __name__ == "__main__":
     print("\n=== Obolus Recommender Tests ===\n")
     test_project_costs_basic()
@@ -161,4 +233,10 @@ if __name__ == "__main__":
     test_recommend_no_results()
     test_recommend_with_results()
     test_recommend_picks_best_per_type()
+    test_load_organ_hints_absent()
+    from pathlib import Path as _P
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as d:
+        test_load_organ_hints_valid(_P(d))
     print("\n=== All recommender tests passed! ===\n")

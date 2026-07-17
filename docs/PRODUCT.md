@@ -22,7 +22,7 @@ Private training lab (DNA → QLoRA → DPO → recipe ratchet → dogfood mutat
 [docs/research/ARENA_LAB.md](research/ARENA_LAB.md) for proven knobs that may
 later inform product defaults — not shipped in the stranger path.
 
-**Future (optional):** Arena may export local **organ** hints (Ollama tags + z only) for an advanced recommend path. That fold is experimental and absent by default; the stranger path below does not require Arena. See Arena `docs/NORTH_STAR.md`. This product is **not** claiming production-ready organ metabolism.
+**Optional (Phase 11 product fold):** Arena can export local **organ** hints (Ollama tags + z only). Copy into `data/organ_hints.json` (or set `OBULUS_ORGAN_HINTS`) and `obulus.py recommend` shows an extra section. Absent by default — stranger path below does not require Arena. See [ARENA_LAB.md](research/ARENA_LAB.md) and Arena `docs/NORTH_STAR.md`. Still **not** production-ready organ metabolism.
 
 ## Stranger path
 

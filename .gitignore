@@ -13,6 +13,7 @@ data/evolution_curve.json
 data/evolution_history.json
 data/mutation_leaderboard.json
 data/hardware_state.json
+data/organ_hints.json
 
 # IDE
 .idea/
