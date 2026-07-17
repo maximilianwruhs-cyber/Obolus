@@ -62,7 +62,7 @@ Same ladder on `Qwen/Qwen2.5-Coder-1.5B-Instruct` / `qwen2.5-coder:1.5b` (see Ar
 
 ## Future (10× direction — not a ship claim)
 
-Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–22 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1→v0.2, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate, product fold v0.2 (`organs fold`). Public stranger path stays `make demo`. Still **not production-ready**.
+Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–23 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1→v0.2, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate, product fold v0.2 (`organs fold`), operator overnight hold (`cargo run -- hold --hours 8`). Public stranger path stays `make demo`. Still **not production-ready**.
 
 ### Product fold v0.2 (optional)
 
