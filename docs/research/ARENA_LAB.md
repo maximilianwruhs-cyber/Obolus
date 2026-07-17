@@ -54,7 +54,7 @@ Contamination rule: Phase-1 math suite prompts (`math_001`–`math_015`) are **e
 
 ## Dogfood mutator (specialized skill organ)
 
-Arena Phase 6 trains a one-skill editor on **local** mutation traces + synthetic dogfood fixtures (no FineWeb). The harness is the product: exact SEARCH/REPLACE apply, pytest gate, then optional LoRA. Phase **6b** adds a toy microbench suite (`--suite microbench`); Phase **6c** (later) can point the same loop at Obolus product scripts. Fixed train/eval scaffold — DNA mutates policy, not the holdout suite.
+Arena Phase 6 trains a one-skill editor on **local** mutation traces + synthetic dogfood fixtures (no FineWeb). The harness is the product: exact SEARCH/REPLACE apply, pytest gate, then optional LoRA. Phase **6b** is toy microbench (`--suite microbench`); Phase **6c** dogfoods **fixture mirrors** of product helpers (z / price_factor / evaluator / energy) via `--suite obolus` — never live public tree mid-flight. Fixed train/eval scaffold — DNA mutates policy, not the holdout suite.
 
 ## Next scale
 
