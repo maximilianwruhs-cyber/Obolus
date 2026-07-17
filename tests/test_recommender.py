@@ -176,6 +176,22 @@ def test_load_organ_hints_valid(tmp_path):
     print("  ✅ PASS: load_organ_hints valid")
 
 
+def test_load_organ_hints_v2_fields(tmp_path):
+    """Phase 22 v2 hints keep tag+z and optional role/metric."""
+    path = tmp_path / "organ_hints.json"
+    path.write_text(
+        '{"version":2,"hints":[{"ollama_tag":"obolus-arena-mutator","z":1.0,'
+        '"organ_id":"mutator-search-replace","role":"mutator",'
+        '"status":"champion","metric":"pass_rate"}]}'
+    )
+    hints = load_organ_hints(path)
+    assert hints is not None
+    assert hints[0]["role"] == "mutator"
+    assert hints[0]["metric"] == "pass_rate"
+    assert hints[0]["z"] == 1.0
+    print("  ✅ PASS: load_organ_hints v2 fields")
+
+
 def test_recommend_without_hints_omits_key(monkeypatch, tmp_path):
     """When hints file missing, recommend dict has no organ_hints key."""
     import config as cfg
@@ -239,4 +255,5 @@ if __name__ == "__main__":
 
     with tempfile.TemporaryDirectory() as d:
         test_load_organ_hints_valid(_P(d))
+        test_load_organ_hints_v2_fields(_P(d))
     print("\n=== All recommender tests passed! ===\n")

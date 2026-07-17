@@ -62,15 +62,14 @@ Same ladder on `Qwen/Qwen2.5-Coder-1.5B-Instruct` / `qwen2.5-coder:1.5b` (see Ar
 
 ## Future (10× direction — not a ship claim)
 
-Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–21 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate (`cargo run -- readiness`; `production_ready` always false). Public stranger path stays `make demo`. Still **not production-ready**.
+Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–22 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1→v0.2, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate, product fold v0.2 (`organs fold`). Public stranger path stays `make demo`. Still **not production-ready**.
 
-### Product fold v0.1 (optional)
+### Product fold v0.2 (optional)
 
 ```bash
-# In obolus-arena (after scoring answerer organs):
-cargo run -- organs export --out data/organ_hints.json
-cp data/organ_hints.json ../Obolus/data/organ_hints.json
-# In Obolus — recommend shows an extra hints block; make demo still works without the file
+# In obolus-arena (after readiness / organ scores):
+cargo run -- organs fold --obolus-root ../Obolus --require-readiness
+# In Obolus — recommend shows role/metric hints; make demo still works without the file
 obulus.py recommend
 ```
 

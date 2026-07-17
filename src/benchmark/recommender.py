@@ -14,7 +14,8 @@ from src.benchmark.awattar import resolve_price
 
 def load_organ_hints(path: Path = None) -> Optional[list]:
     """
-    Optional Arena product-fold hints: [{ollama_tag, z}, ...].
+    Optional Arena product-fold hints: [{ollama_tag, z, ...}, ...].
+    v1 = tags+z; v2 may add organ_id/role/status/metric (Phase 22).
     Returns None when absent/empty/invalid so stranger recommend is unchanged.
     """
     path = path if path is not None else config.ORGAN_HINTS_PATH
@@ -39,9 +40,14 @@ def load_organ_hints(path: Path = None) -> Optional[list]:
         if not tag or z is None:
             continue
         try:
-            hints.append({"ollama_tag": str(tag), "z": float(z)})
+            hint = {"ollama_tag": str(tag), "z": float(z)}
         except (TypeError, ValueError):
             continue
+        for key in ("organ_id", "role", "status", "metric"):
+            val = item.get(key)
+            if val is not None and val != "":
+                hint[key] = str(val)
+        hints.append(hint)
     if not hints:
         return None
     hints.sort(key=lambda h: h["z"], reverse=True)
@@ -258,9 +264,11 @@ def print_recommendation(rec: dict = None):
         print(f"  ║  🧬 Arena organ hints (optional; experimental){' '*16}║")
         print(f"  ║{' '*62}║")
         for hint in organ_hints[:8]:
-            tag = str(hint.get("ollama_tag", "?"))[:28]
+            tag = str(hint.get("ollama_tag", "?"))[:22]
+            role = str(hint.get("role") or "?")[:8]
+            metric = str(hint.get("metric") or "z")
             z = float(hint.get("z", 0.0))
-            print(f"  ║     {tag:<28} z={z:.4f}{' '*17}║")
+            print(f"  ║     {tag:<22} {role:<8} {metric}={z:.4f}{' '*6}║")
         print(f"  ║{' '*62}║")
 
     print(f"  ╚{'═'*62}╝")
