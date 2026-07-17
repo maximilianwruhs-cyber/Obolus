@@ -23,8 +23,9 @@ Base: `Qwen/Qwen2.5-Coder-0.5B-Instruct` / Ollama `qwen2.5-coder:0.5b`
 | Token curation | 4-tier filter (density / educational / syntactic / reasoning) — see Arena `TOKEN_CURATION.md` | n/a |
 | DPO | Preference pairs (synthetic brevity default) on SFT merged | `obolus-arena-dpo` |
 | Recipe ratchet | Mutate one SFT hyperparam → mini-SFT → keep/discard on **z** | `obolus-arena-ratchet` |
+| Dogfood mutator | Ultra-small SEARCH/REPLACE skill organ: DNA over frozen coder → apply+pytest → dense SFT | `obolus-arena-mutator` |
 
-Contamination rule: Phase-1 math suite prompts (`math_001`–`math_015`) are **eval-only**.
+Contamination rule: Phase-1 math suite prompts (`math_001`–`math_015`) are **eval-only**. Dogfood holdout tasks (`split=holdout` in Arena `dogfood/tasks.jsonl`) are likewise eval-only for the mutator.
 
 ## Accept / noise
 
@@ -50,6 +51,10 @@ Contamination rule: Phase-1 math suite prompts (`math_001`–`math_015`) are **e
 | z-score, offline price, RAPL/estimate | DNA forge / sole-survivor population |
 | Math suite benchmarking | QLoRA / DPO / recipe overnight loops |
 | Recommend best local model | Adapter export / Ollama tag factory |
+
+## Dogfood mutator (specialized skill organ)
+
+Arena Phase 6 trains a one-skill editor on **local** mutation traces + synthetic dogfood fixtures (no FineWeb). The harness is the product: exact SEARCH/REPLACE apply, pytest gate, then optional LoRA. Clone the same loop later for toy microbenches or Obolus product scripts. Fixed train/eval scaffold — DNA mutates policy, not the holdout suite.
 
 ## Next scale
 
