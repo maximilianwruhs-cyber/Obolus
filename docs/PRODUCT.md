@@ -17,10 +17,12 @@
 - Process reapers, host mutation tools, or datacenter agent personas
 - Cloud SaaS or remote telemetry
 
-Private training lab (DNA → QLoRA → DPO → recipe ratchet) lives in
+Private training lab (DNA → QLoRA → DPO → recipe ratchet → dogfood mutator) lives in
 [obolus-arena](https://github.com/maximilianwruhs-cyber/obolus-arena); see
 [docs/research/ARENA_LAB.md](research/ARENA_LAB.md) for proven knobs that may
 later inform product defaults — not shipped in the stranger path.
+
+**Future (optional):** Arena may export local **organ** hints (Ollama tags + z only) for an advanced recommend path. That fold is experimental and absent by default; the stranger path below does not require Arena. See Arena `docs/NORTH_STAR.md`. This product is **not** claiming production-ready organ metabolism.
 
 ## Stranger path
 
