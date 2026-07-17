@@ -17,6 +17,11 @@
 - Process reapers, host mutation tools, or datacenter agent personas
 - Cloud SaaS or remote telemetry
 
+Private training lab (DNA → QLoRA → DPO → recipe ratchet) lives in
+[obolus-arena](https://github.com/maximilianwruhs-cyber/obolus-arena); see
+[docs/research/ARENA_LAB.md](research/ARENA_LAB.md) for proven knobs that may
+later inform product defaults — not shipped in the stranger path.
+
 ## Stranger path
 
 ```bash
