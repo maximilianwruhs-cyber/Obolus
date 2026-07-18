@@ -1,7 +1,9 @@
-# Obolus Arena lab — proven knobs (private)
+# Obolus Arena lab — proven knobs
 
-Private harness: [obolus-arena](https://github.com/maximilianwruhs-cyber/obolus-arena) (not production-ready).  
-Public product still ships **MCP-first** benchmarking; this note captures what the lab already verified so product docs stay honest.
+Open lab harness: [Obolus-Arena](https://github.com/maximilianwruhs-cyber/Obolus-Arena).  
+Public product still ships **MCP-first** benchmarking (`make demo`); this note captures what the lab verified so product docs stay honest.
+
+Organ hints from Arena are **optional and display-only** — they never change `best_overall`.
 
 ## Metric (shared with product)
 
@@ -29,45 +31,20 @@ Contamination rule: Phase-1 math suite prompts (`math_001`–`math_015`) are **e
 
 ## Accept / noise
 
-- Simple ε floor for DNA sole-survivor
-- Recipe ratchet: `max(ε, mad_k × MAD)` over champion re-scores (default 3 samples, `mad_k=1`) — same idea as pi-autoresearch
+Same doctrine as product eval noise floor: challenger must clear `max(ε, k·MAD)` on holdout **z** / pass_rate before promote. Experimental organs may graduate via `organs seal` when MAD holdout clears a minimum floor (human-in-the-loop; overnight promote stays dry-run).
 
-## Recipe bounds (ratchet editable asset)
-
-| Knob | Bounds |
-|------|--------|
-| `lr` | `[1e-5, 5e-4]` |
-| `epochs` | `[0.5, 3.0]` |
-| `lora_r` | `{8, 16, 32}` |
-| `n` | `[100, 2000]` |
-| `batch_size` | `[1, 8]` |
-| `grad_accum` | `[1, 32]` |
-| `max_seq_len` | `[128, 1024]` |
-
-## What belongs in the public product vs lab
-
-| In public Obolus | Stays in Arena lab |
-|------------------|--------------------|
-| z-score, offline price, RAPL/estimate | DNA forge / sole-survivor population |
-| Math suite benchmarking | QLoRA / DPO / recipe overnight loops |
-| Recommend best local model | Adapter export / Ollama tag factory |
-
-## Dogfood mutator (specialized skill organ)
-
-Arena Phase 6 trains a one-skill editor on **local** mutation traces + synthetic dogfood fixtures (no FineWeb). The harness is the product: exact SEARCH/REPLACE apply, pytest gate, then optional LoRA. Phase **6b** is toy microbench (`--suite microbench`); Phase **6c** dogfoods **fixture mirrors** of product helpers (z / price_factor / evaluator / energy) via `--suite obolus` — never live public tree mid-flight. Fixed train/eval scaffold — DNA mutates policy, not the holdout suite.
-
-## Next scale
+## Same ladder on 1.5B
 
 Same ladder on `Qwen/Qwen2.5-Coder-1.5B-Instruct` / `qwen2.5-coder:1.5b` (see Arena `docs/PLAN.md`).
 
-## Future (10× direction — not a ship claim)
+## Future (10× direction)
 
-Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–12** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/obolus-arena/blob/main/docs/NORTH_STAR.md). **Phases 7–26 done:** mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1→v0.2, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate, product fold v0.2 (`organs fold`), operator overnight hold (`hold --hours 8`), hold report digest (`hold --report`), lab smoke (`cargo run -- smoke` / `make lab-smoke`), **ship bar** (`docs/SHIP_BAR.md` — `production_ready` only with `--authorize-production` after ship checks). Public stranger path stays `make demo`. **Ship bar cleared 2026-07-18** (`production_ready` via Arena `--authorize-production`); organ hints remain display-only in recommend.
+Arena’s north star is a **local metabolism of skill organs** (mutator, router, answerer) that promote only under **z**, then optionally export tags+z hints into public Obolus. Phases **7–26** live in Arena [`docs/NORTH_STAR.md`](https://github.com/maximilianwruhs-cyber/Obolus-Arena/blob/main/docs/NORTH_STAR.md): mutator gate, organ registry, JSON router, metabolism timer, product fold v0.1→v0.2, safe apply zone, organ promotion, patch ranker, overnight metabolism, ranker SFT (`obolus-arena-ranker`), mutator×ranker coupling, suite-aware dogfood apply, mutator trace harvest, metabolize **hold** pack, lab **readiness** gate, operator overnight hold, hold report, lab smoke, **ship bar**. Public stranger path stays `make demo`. **Ship bar cleared 2026-07-18** (`production_ready` via Arena `--authorize-production`); organ hints remain display-only in recommend.
 
 ### Product fold v0.2 (optional, display-only)
 
 ```bash
-# In obolus-arena (after readiness / organ scores):
+# In Obolus-Arena (after readiness / organ scores):
 cargo run -- organs fold --obolus-root ../Obolus --require-readiness
 # In Obolus — recommend shows role/metric hints; does NOT change best_overall
 # make demo still works without the file
@@ -76,10 +53,10 @@ obulus.py recommend
 
 ## Pointers
 
-- Arena policy: `obolus-arena/program.md`
-- Arena phase map: `obolus-arena/docs/PLAN.md`
-- Arena north star: `obolus-arena/docs/NORTH_STAR.md`
-- Ship bar / repro: `obolus-arena/docs/SHIP_BAR.md`, `obolus-arena/docs/REPRO.md`
+- Arena policy: `Obolus-Arena/program.md`
+- Arena phase map: `Obolus-Arena/docs/PLAN.md`
+- Arena north star: `Obolus-Arena/docs/NORTH_STAR.md`
+- Ship bar / repro: `Obolus-Arena/docs/SHIP_BAR.md`, `Obolus-Arena/docs/REPRO.md`
 - Broader SLM research: [SLM_TRAINING.md](./SLM_TRAINING.md)
 
 ## Example ladder ranking (single seed; estimate energy)

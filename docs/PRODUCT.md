@@ -17,12 +17,12 @@
 - Process reapers, host mutation tools, or datacenter agent personas
 - Cloud SaaS or remote telemetry
 
-Private training lab (DNA → QLoRA → DPO → recipe ratchet → dogfood mutator) lives in
-[obolus-arena](https://github.com/maximilianwruhs-cyber/obolus-arena); see
+Open training lab (DNA → QLoRA → DPO → recipe ratchet → dogfood mutator → organs) lives in
+[Obolus-Arena](https://github.com/maximilianwruhs-cyber/Obolus-Arena); see
 [docs/research/ARENA_LAB.md](research/ARENA_LAB.md) for proven knobs that may
-later inform product defaults — not shipped in the stranger path.
+inform product defaults — not required for the stranger path below.
 
-**Optional (Phase 22 product fold v0.2):** Arena can fold local **organ** hints (tag + score + role/metric) via `organs fold`. Copy lands in `data/organ_hints.json` (or set `OBULUS_ORGAN_HINTS`); `obulus.py recommend` shows an extra **display-only** section — hints never override `best_overall`. Absent by default — stranger path below does not require Arena. See [ARENA_LAB.md](research/ARENA_LAB.md) and Arena `docs/SHIP_BAR.md`. Organ metabolism stays behind the Arena ship bar.
+**Optional (product fold v0.2):** Arena can fold local **organ** hints (tag + score + role/metric) via `organs fold`. Copy lands in `data/organ_hints.json` (or set `OBULUS_ORGAN_HINTS`); `obulus.py recommend` shows an extra **display-only** section — hints never override `best_overall`. Absent by default. See [ARENA_LAB.md](research/ARENA_LAB.md) and Arena [`docs/SHIP_BAR.md`](https://github.com/maximilianwruhs-cyber/Obolus-Arena/blob/main/docs/SHIP_BAR.md).
 
 ## Stranger path
 

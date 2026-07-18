@@ -280,7 +280,7 @@ Useful if the mutator job is **span fill / short rewrite** with a seq2seq head; 
 
 ## 5c. Arena lab results (private)
 
-Private harness [obolus-arena](https://github.com/maximilianwruhs-cyber/obolus-arena) exercises the ladder in §6 on a workstation GPU.
+Open lab harness [Obolus-Arena](https://github.com/maximilianwruhs-cyber/Obolus-Arena) exercises the ladder in §6 on a workstation GPU.
 Proven knobs, contamination rules, and MAD accept: [ARENA_LAB.md](./ARENA_LAB.md).
 
 Phase 5 dense-data notes (desk → Arena): [desk/For_training_very_small_models_datasets.md](desk/For_training_very_small_models_datasets.md), [desk/Token_Curation_Architecture.md](desk/Token_Curation_Architecture.md). Arena summary: `obolus-arena/docs/research/TOKEN_CURATION.md`.
