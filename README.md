@@ -57,7 +57,7 @@ Cost projections use your configured ¢/kWh (offline by default). Live spot pric
 | Command | Description |
 |---------|-------------|
 | `make setup` | Create venv and install dependencies |
-| `make demo` | Short stranger path: math bench → recommend |
+| `make demo` | Quick demo: math bench → recommend |
 | `make bench` | Benchmark auto-detected model (`math` suite) |
 | `make bench-full` | Benchmark all task suites |
 | `make recommend` | Show model recommendations + cost projections |

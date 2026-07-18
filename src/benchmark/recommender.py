@@ -16,7 +16,7 @@ def load_organ_hints(path: Path = None) -> Optional[list]:
     """
     Optional Arena product-fold hints: [{ollama_tag, z, ...}, ...].
     v1 = tags+z; v2 may add organ_id/role/status/metric (Phase 22).
-    Returns None when absent/empty/invalid so stranger recommend is unchanged.
+    Returns None when absent/empty/invalid so default recommend is unchanged.
     """
     path = path if path is not None else config.ORGAN_HINTS_PATH
     if not path.exists():
@@ -178,7 +178,7 @@ def recommend(results: list = None) -> Optional[dict]:
         "price_is_live": price_is_live,
         "timestamp": datetime.now().isoformat(),
     }
-    # Optional only — omit key when absent so stranger path stays identical.
+    # Optional only — omit key when absent so default recommend stays identical.
     organ_hints = load_organ_hints()
     if organ_hints is not None:
         out["organ_hints"] = organ_hints

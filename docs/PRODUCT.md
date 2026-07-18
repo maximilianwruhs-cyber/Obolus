@@ -20,7 +20,7 @@
 Open training lab (DNA → QLoRA → DPO → recipe ratchet → dogfood mutator → organs) lives in
 [Obolus-Arena](https://github.com/maximilianwruhs-cyber/Obolus-Arena); see
 [docs/research/ARENA_LAB.md](research/ARENA_LAB.md) for proven knobs that may
-inform product defaults — not required for the stranger path below.
+inform product defaults — not required for the quick start below.
 
 **Optional (product fold v0.2):** Arena can fold local **organ** hints (tag + score + role/metric) via `organs fold`. Copy lands in `data/organ_hints.json` (or set `OBULUS_ORGAN_HINTS`); `obulus.py recommend` shows an extra **display-only** section — hints never override `best_overall`. Absent by default. See [ARENA_LAB.md](research/ARENA_LAB.md) and Arena [`docs/SHIP_BAR.md`](https://github.com/maximilianwruhs-cyber/Obolus-Arena/blob/main/docs/SHIP_BAR.md).
 

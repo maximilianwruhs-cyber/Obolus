@@ -157,7 +157,7 @@ def test_recommend_picks_best_per_type():
 
 
 def test_load_organ_hints_absent():
-    """Missing hints file → None (stranger path unchanged)."""
+    """Missing hints file → None (default recommend unchanged)."""
     assert load_organ_hints(Path("/nonexistent/organ_hints.json")) is None
     print("  ✅ PASS: load_organ_hints absent")
 
